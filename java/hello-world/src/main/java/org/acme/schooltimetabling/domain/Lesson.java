@@ -15,13 +15,13 @@ public class Lesson {
     private String studentGroup;
     private int studentCount;
 
-    @PlanningVariable
+    @PlanningVariable(allowsUnassigned = true)
     private Teacher teacher;
 
-    @PlanningVariable
+    @PlanningVariable(allowsUnassigned = true)
     private Timeslot timeslot;
 
-    @PlanningVariable
+    @PlanningVariable(allowsUnassigned = true)
     private Room room;
 
     // No-arg constructor required for Timefold
@@ -77,6 +77,21 @@ public class Lesson {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public int getFee() {
+        return switch (subject) {
+            case "EDV_01" -> 20;
+            case "EDV_02" -> 30;
+            case "Webdesign" -> 25;
+            case "Malerei" -> 30;
+            case "Tonformen" -> 50;
+            default -> 0;
+        };
+    }
+
+    public int getTotalRevenue() {
+        return studentCount * getFee();
     }
 
 }

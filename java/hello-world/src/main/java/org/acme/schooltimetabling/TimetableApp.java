@@ -56,21 +56,21 @@ public class TimetableApp {
         // --- B. Create the 4 Rooms ---
         List<Room> rooms = new ArrayList<>();
         long nextRoomId = 0L;
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 01", 30));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 02", 30));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 03", 30));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 04", 30));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 01", 10));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 02", 12));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 03", 8));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 04", 5));
 
         // --- C. Create the Teachers (Constraints from PDF) ---
         List<Teacher> teachers = new ArrayList<>();
         // Ahorn: EDV_01, EDV_02. Cap 7.
-        teachers.add(new Teacher("Frau Ahorn", Set.of("EDV_01", "EDV_02"), 7, true, true));
+        teachers.add(new Teacher("Frau Ahorn", Set.of("EDV_01", "EDV_02"), 7, "NONE"));
         // Eiche: EDV_02, Webdesign. Cap 5.
-        teachers.add(new Teacher("Herr Eiche", Set.of("EDV_02", "Webdesign"), 5, true, true));
+        teachers.add(new Teacher("Herr Eiche", Set.of("EDV_02", "Webdesign"), 5, "NONE"));
         // Birke: Webdesign, Malerei. Cap 4. Morning Only.
-        teachers.add(new Teacher("Frau Birke", Set.of("Webdesign", "Malerei"), 4, true, false));
+        teachers.add(new Teacher("Frau Birke", Set.of("Webdesign", "Malerei"), 4, "MORNING_ONLY"));
         // Kiefer: Malerei, Tonformen. Cap 5. Afternoon Only.
-        teachers.add(new Teacher("Herr Kiefer", Set.of("Malerei", "Tonformen"), 5, false, true));
+        teachers.add(new Teacher("Herr Kiefer", Set.of("Malerei", "Tonformen"), 5, "AFTERNOON_ONLY"));
 
         // --- D. Create Lessons (The Demand) ---
 
@@ -84,7 +84,7 @@ public class TimetableApp {
 
         List<Lesson> lessons = new ArrayList<>();
         long nextLessonId = 0L;
-        int maxClassSize = 30;
+        int maxClassSize = 10;
 
         for (Map.Entry<String, Integer> entry : courseDemand.entrySet()) {
             String subject = entry.getKey();
