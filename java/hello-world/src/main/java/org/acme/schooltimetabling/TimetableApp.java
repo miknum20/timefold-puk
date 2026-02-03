@@ -32,8 +32,6 @@ public class TimetableApp {
                 // It's recommended to run for at least 5 minutes ("5m") otherwise.
                 .withTerminationSpentLimit(Duration.ofSeconds(5)));
 
-
-
         // Load the problem
         Timetable problem = generateDemoData(DemoData.SMALL);
 
@@ -58,21 +56,21 @@ public class TimetableApp {
         // --- B. Create the 4 Rooms ---
         List<Room> rooms = new ArrayList<>();
         long nextRoomId = 0L;
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 01", 100));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 02", 100));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 03", 100));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 04", 100));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 01", 30));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 02", 30));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 03", 30));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 04", 30));
 
         // --- C. Create the Teachers (Constraints from PDF) ---
         List<Teacher> teachers = new ArrayList<>();
         // Ahorn: EDV_01, EDV_02. Cap 7.
-        teachers.add(new Teacher("Frau Ahorn", Set.of("EDV_01", "EDV_02"), 7, "NONE"));
+        teachers.add(new Teacher("Frau Ahorn", Set.of("EDV_01", "EDV_02"), 7, true, true));
         // Eiche: EDV_02, Webdesign. Cap 5.
-        teachers.add(new Teacher("Herr Eiche", Set.of("EDV_02", "Webdesign"), 5, "NONE"));
+        teachers.add(new Teacher("Herr Eiche", Set.of("EDV_02", "Webdesign"), 5, true, true));
         // Birke: Webdesign, Malerei. Cap 4. Morning Only.
-        teachers.add(new Teacher("Frau Birke", Set.of("Webdesign", "Malerei"), 4, "MORNING_ONLY"));
+        teachers.add(new Teacher("Frau Birke", Set.of("Webdesign", "Malerei"), 4, true, false));
         // Kiefer: Malerei, Tonformen. Cap 5. Afternoon Only.
-        teachers.add(new Teacher("Herr Kiefer", Set.of("Malerei", "Tonformen"), 5, "AFTERNOON_ONLY"));
+        teachers.add(new Teacher("Herr Kiefer", Set.of("Malerei", "Tonformen"), 5, false, true));
 
         // --- D. Create Lessons (The Demand) ---
 
@@ -86,7 +84,7 @@ public class TimetableApp {
 
         List<Lesson> lessons = new ArrayList<>();
         long nextLessonId = 0L;
-        int maxClassSize = 50;
+        int maxClassSize = 30;
 
         for (Map.Entry<String, Integer> entry : courseDemand.entrySet()) {
             String subject = entry.getKey();
@@ -106,158 +104,6 @@ public class TimetableApp {
         // Pass teachers to the Timetable constructor
         return new Timetable(timeslots.get(0).getId(), timeslots, rooms, teachers, lessons);
 
-        // OLD CODE:
-
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.MONDAY, LocalTime.of(8, 30), LocalTime.of(9, 30)));
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.MONDAY, LocalTime.of(9, 30), LocalTime.of(10, 30)));
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.MONDAY, LocalTime.of(10, 30), LocalTime.of(11, 30)));
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.MONDAY, LocalTime.of(13, 30), LocalTime.of(14, 30)));
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.MONDAY, LocalTime.of(14, 30), LocalTime.of(15, 30)));
-//
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.TUESDAY, LocalTime.of(8, 30), LocalTime.of(9, 30)));
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.TUESDAY, LocalTime.of(9, 30), LocalTime.of(10, 30)));
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.TUESDAY, LocalTime.of(10, 30), LocalTime.of(11, 30)));
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.TUESDAY, LocalTime.of(13, 30), LocalTime.of(14, 30)));
-//        timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.TUESDAY, LocalTime.of(14, 30), LocalTime.of(15, 30)));
-//        if (demoData == DemoData.LARGE) {
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.WEDNESDAY, LocalTime.of(8, 30), LocalTime.of(9, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.WEDNESDAY, LocalTime.of(9, 30), LocalTime.of(10, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.WEDNESDAY, LocalTime.of(10, 30), LocalTime.of(11, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.WEDNESDAY, LocalTime.of(13, 30), LocalTime.of(14, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.WEDNESDAY, LocalTime.of(14, 30), LocalTime.of(15, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.THURSDAY, LocalTime.of(8, 30), LocalTime.of(9, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.THURSDAY, LocalTime.of(9, 30), LocalTime.of(10, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.THURSDAY, LocalTime.of(10, 30), LocalTime.of(11, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.THURSDAY, LocalTime.of(13, 30), LocalTime.of(14, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.THURSDAY, LocalTime.of(14, 30), LocalTime.of(15, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.FRIDAY, LocalTime.of(8, 30), LocalTime.of(9, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.FRIDAY, LocalTime.of(9, 30), LocalTime.of(10, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.FRIDAY, LocalTime.of(10, 30), LocalTime.of(11, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), DayOfWeek.FRIDAY, LocalTime.of(13, 30), LocalTime.of(14, 30)));
-//            timeslots.add(new Timeslot(Long.toString(nextTimeslotId), DayOfWeek.FRIDAY, LocalTime.of(14, 30), LocalTime.of(15, 30)));
-//        }
-//
-//        List<Room> rooms = new ArrayList<>(3);
-//        long nextRoomId = 0L;
-//        rooms.add(new Room(Long.toString(nextRoomId++), "Room A"));
-//        rooms.add(new Room(Long.toString(nextRoomId++), "Room B"));
-//        rooms.add(new Room(Long.toString(nextRoomId++), "Room C"));
-//        if (demoData == DemoData.LARGE) {
-//            rooms.add(new Room(Long.toString(nextRoomId++), "Room D"));
-//            rooms.add(new Room(Long.toString(nextRoomId++), "Room E"));
-//            rooms.add(new Room(Long.toString(nextRoomId), "Room F"));
-//        }
-//
-//        List<Lesson> lessons = new ArrayList<>();
-//        long nextLessonId = 0L;
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Mathe", "A. Turing", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Mathe", "A. Turing", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Physics", "M. Curie", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Chemistry", "M. Curie", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Biology", "C. Darwin", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "I. Jones", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "I. Jones", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Spanish", "P. Cruz", "9th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Spanish", "P. Cruz", "9th grade"));
-//        if (demoData == DemoData.LARGE) {
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Mathe", "A. Turing", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Mathe", "A. Turing", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Mathe", "A. Turing", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "ICT", "A. Turing", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physics", "M. Curie", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Geography", "C. Darwin", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Geology", "C. Darwin", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "I. Jones", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Drama", "I. Jones", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Art", "S. Dali", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Art", "S. Dali", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "9th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "9th grade"));
-//        }
-//
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Physics", "M. Curie", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Chemistry", "M. Curie", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "French", "M. Curie", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Geography", "C. Darwin", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "10th grade"));
-//        lessons.add(new Lesson(Long.toString(nextLessonId++), "Spanish", "P. Cruz", "10th grade"));
-//        if (demoData == DemoData.LARGE) {
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "ICT", "A. Turing", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physics", "M. Curie", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Biology", "C. Darwin", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Geology", "C. Darwin", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Drama", "I. Jones", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Art", "S. Dali", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Art", "S. Dali", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "10th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "10th grade"));
-//
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "ICT", "A. Turing", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physics", "M. Curie", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Chemistry", "M. Curie", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "French", "M. Curie", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physics", "M. Curie", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Geography", "C. Darwin", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Biology", "C. Darwin", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Geology", "C. Darwin", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Spanish", "P. Cruz", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Drama", "P. Cruz", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Art", "S. Dali", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Art", "S. Dali", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "11th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "11th grade"));
-//
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Math", "A. Turing", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "ICT", "A. Turing", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physics", "M. Curie", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Chemistry", "M. Curie", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "French", "M. Curie", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physics", "M. Curie", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Geography", "C. Darwin", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Biology", "C. Darwin", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Geology", "C. Darwin", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "History", "I. Jones", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "English", "P. Cruz", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Spanish", "P. Cruz", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Drama", "P. Cruz", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Art", "S. Dali", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Art", "S. Dali", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId++), "Physical education", "C. Lewis", "12th grade"));
-//            lessons.add(new Lesson(Long.toString(nextLessonId), "Physical education", "C. Lewis", "12th grade"));
-//        }
-//        return new Timetable(demoData.name(), timeslots, rooms, lessons);
     }
 
     private static void printTimetable(Timetable timeTable) {
@@ -281,24 +127,15 @@ public class TimetableApp {
                         return Objects.requireNonNullElse(cellLessons, Collections.<Lesson>emptyList());
                     }).toList();
 
+            // Row 1: Subject
             LOGGER.info("| " + String.format("%-10s",
                     timeslot.getDayOfWeek().toString().substring(0, 3) + " " + timeslot.getStartTime()) + " | "
                     + cells.stream().map(cellLessons -> String.format("%-10s",
                             cellLessons.stream().map(Lesson::getSubject).collect(Collectors.joining(", "))))
-                            .collect(Collectors.joining(" | "))
+                    .collect(Collectors.joining(" | "))
                     + " |");
-//            LOGGER.info("|            | "
-//                    + cells.stream().map(cellLessons -> String.format("%-10s",
-//                            cellLessons.stream().map(Lesson::getTeacher).collect(Collectors.joining(", "))))
-//                            .collect(Collectors.joining(" | "))
-//                    + " |");
-//            LOGGER.info("|            | "
-//                    + cells.stream().map(cellLessons -> String.format("%-10s",
-//                            cellLessons.stream().map(Lesson::getStudentGroup).collect(Collectors.joining(", "))))
-//                            .collect(Collectors.joining(" | "))
-//                    + " |");
 
-            // Print the ASSIGNED Teacher
+            // Row 2: Teacher (Assigned)
             LOGGER.info("|            | "
                     + cells.stream().map(cellLessons -> String.format("%-10s",
                             cellLessons.stream().map(l -> l.getTeacher() == null ? "Unassigned" : l.getTeacher().getName())
@@ -306,16 +143,29 @@ public class TimetableApp {
                     .collect(Collectors.joining(" | "))
                     + " |");
 
+            // Row 3: Student Count (Useful to see!)
+            LOGGER.info("|            | "
+                    + cells.stream().map(cellLessons -> String.format("%-10s",
+                            cellLessons.stream().map(l -> "(" + l.getStudentCount() + " students)")
+                                    .collect(Collectors.joining(", "))))
+                    .collect(Collectors.joining(" | "))
+                    + " |");
+
             LOGGER.info("|" + "------------|".repeat(rooms.size() + 1));
+
         }
+
         List<Lesson> unassignedLessons = lessons.stream()
-                .filter(lesson -> lesson.getTimeslot() == null || lesson.getRoom() == null)
+                .filter(lesson -> lesson.getTimeslot() == null || lesson.getRoom() == null || lesson.getTeacher() == null)
                 .toList();
+
         if (!unassignedLessons.isEmpty()) {
             LOGGER.info("");
-            LOGGER.info("Unassigned lessons");
+            LOGGER.info("Unassigned lessons (" + unassignedLessons.size() + "):");
             for (Lesson lesson : unassignedLessons) {
-                LOGGER.info("  " + lesson.getSubject() + " - " + lesson.getTeacher() + " - " + lesson.getStudentGroup());
+                // Fix: Added check for null teacher
+                String teacherName = (lesson.getTeacher() == null) ? "No Teacher" : lesson.getTeacher().getName();
+                LOGGER.info("  " + lesson.getSubject() + " [" + lesson.getStudentCount() + " students] - " + teacherName);
             }
         }
     }

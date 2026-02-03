@@ -27,10 +27,21 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 roomConflict(factory),
                 teacherConflict(factory),
                 teacherSkillConstraint(factory),
-                teacherTimeAvailability(factory),
+                teacherAvailability(factory),
                 teacherCapacityConstraint(factory),
-                roomCapacityConstraint(factory)
+                roomCapacityConstraint(factory),
+
+                maximizeAssignedLessons(factory)
         };
+    }
+
+    Constraint maximizeAssignedLessons(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                // Filter for lessons that are successfully assigned
+                .filter(lesson -> lesson.getTimeslot() != null && lesson.getRoom() != null && lesson.getTeacher() != null)
+                // Reward them! (+1 Soft Score per lesson)
+                .reward(HardSoftScore.ONE_SOFT)
+                .asConstraint("Lesson assigned");
     }
 
     Constraint roomCapacityConstraint(ConstraintFactory factory) {
@@ -76,25 +87,18 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     }
 
     // 4. Time Restrictions (Birke = Vormittag, Kiefer = Nachmittag)
-    Constraint teacherTimeAvailability(ConstraintFactory factory) {
+    Constraint teacherAvailability(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-                .filter(lesson -> lesson.getTeacher() != null && lesson.getTimeslot() != null)
                 .filter(lesson -> {
-                    String restriction = lesson.getTeacher().getTimeRestriction();
-                    // We assume the Timeslot ID or a field indicates time.
-                    // Based on my previous TimetableApp code:
-                    // 09:00 slots were added first (Vormittag), 14:00 slots second (Nachmittag).
-                    // Or we check the actual LocalTime.
-
-                    boolean isMorning = lesson.getTimeslot().getStartTime().getHour() < 12;
-
-                    if ("MORNING_ONLY".equals(restriction) && !isMorning) return true; // Penalize
-                    if ("AFTERNOON_ONLY".equals(restriction) && isMorning) return true; // Penalize
+                    boolean isMorning = lesson.getTimeslot().isMorning();
+                    if (isMorning && !lesson.getTeacher().isAvailableMorning()) return true;
+                    if (!isMorning && !lesson.getTeacher().isAvailableAfternoon()) return true;
                     return false;
                 })
                 .penalize(HardSoftScore.ONE_HARD)
                 .asConstraint("Teacher unavailable at this time");
     }
+
 
     // 5. Max Capacity (Ahorn=7, Eiche=5, etc.)
     Constraint teacherCapacityConstraint(ConstraintFactory factory) {

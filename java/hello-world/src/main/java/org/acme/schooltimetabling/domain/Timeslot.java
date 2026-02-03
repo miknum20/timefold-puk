@@ -55,4 +55,8 @@ public class Timeslot {
         return endTime;
     }
 
+    public boolean isMorning() {
+        return startTime.isBefore(LocalTime.of(13, 0));
+    }
+
 }

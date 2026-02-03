@@ -7,20 +7,27 @@ public class Teacher {
     private String name;
     private Set<String> skills;       // e.g. ["EDV_01", "EDV_02"]
     private int maxCapacity;          // e.g. 7
-    private String timeRestriction;   // "NONE", "MORNING_ONLY", "AFTERNOON_ONLY"
+    private boolean availableMorning;
+    private boolean availableAfternoon;
 
-    public Teacher(String name, Set<String> skills, int maxCapacity, String timeRestriction) {
+    public Teacher(String name, Set<String> skills, int maxCapacity, boolean availableMorning, boolean availableAfternoon) {
         this.name = name;
         this.skills = skills;
         this.maxCapacity = maxCapacity;
-        this.timeRestriction = timeRestriction;
+        this.availableMorning = availableMorning;
+        this.availableAfternoon = availableAfternoon;
     }
 
     // Add Getters and Setters here (crucial for Timefold)
     public String getName() { return name; }
     public Set<String> getSkills() { return skills; }
     public int getMaxCapacity() { return maxCapacity; }
-    public String getTimeRestriction() { return timeRestriction; }
+    public boolean isAvailableMorning() {
+        return availableMorning;
+    }
+    public boolean isAvailableAfternoon() {
+        return availableAfternoon;
+    }
 
     @Override
     public String toString() {
