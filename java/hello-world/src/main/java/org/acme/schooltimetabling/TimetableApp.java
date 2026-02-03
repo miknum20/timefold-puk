@@ -30,7 +30,7 @@ public class TimetableApp {
                 .withConstraintProviderClass(TimetableConstraintProvider.class)
                 // The solver runs only for 5 seconds on this small dataset.
                 // It's recommended to run for at least 5 minutes ("5m") otherwise.
-                .withTerminationSpentLimit(Duration.ofSeconds(5)));
+                .withTerminationSpentLimit(Duration.ofSeconds(30)));
 
 
 
@@ -58,10 +58,10 @@ public class TimetableApp {
         // --- B. Create the 4 Rooms ---
         List<Room> rooms = new ArrayList<>();
         long nextRoomId = 0L;
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 01", 100));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 02", 100));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 03", 100));
-        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 04", 100));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 01", 10));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 02", 12));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 03", 8));
+        rooms.add(new Room(Long.toString(nextRoomId++), "Raum 04", 5));
 
         // --- C. Create the Teachers (Constraints from PDF) ---
         List<Teacher> teachers = new ArrayList<>();
@@ -86,7 +86,7 @@ public class TimetableApp {
 
         List<Lesson> lessons = new ArrayList<>();
         long nextLessonId = 0L;
-        int maxClassSize = 50;
+        int maxClassSize = 10;
 
         for (Map.Entry<String, Integer> entry : courseDemand.entrySet()) {
             String subject = entry.getKey();
@@ -265,7 +265,7 @@ public class TimetableApp {
         List<Room> rooms = timeTable.getRooms();
         List<Lesson> lessons = timeTable.getLessons();
         Map<Timeslot, Map<Room, List<Lesson>>> lessonMap = lessons.stream()
-                .filter(lesson -> lesson.getTimeslot() != null && lesson.getRoom() != null)
+                .filter(lesson -> lesson.getTimeslot() != null && lesson.getRoom() != null && lesson.getTeacher() != null)
                 .collect(Collectors.groupingBy(Lesson::getTimeslot, Collectors.groupingBy(Lesson::getRoom)));
         LOGGER.info("|            | " + rooms.stream()
                 .map(room -> String.format("%-10s", room.getName())).collect(Collectors.joining(" | ")) + " |");
@@ -309,13 +309,16 @@ public class TimetableApp {
             LOGGER.info("|" + "------------|".repeat(rooms.size() + 1));
         }
         List<Lesson> unassignedLessons = lessons.stream()
-                .filter(lesson -> lesson.getTimeslot() == null || lesson.getRoom() == null)
+                .filter(lesson -> lesson.getTimeslot() == null || lesson.getRoom() == null || lesson.getTeacher() == null)
                 .toList();
+                
         if (!unassignedLessons.isEmpty()) {
             LOGGER.info("");
-            LOGGER.info("Unassigned lessons");
+            LOGGER.info("Unassigned lessons (Total: " + unassignedLessons.size() + ")");
             for (Lesson lesson : unassignedLessons) {
-                LOGGER.info("  " + lesson.getSubject() + " - " + lesson.getTeacher() + " - " + lesson.getStudentGroup());
+                // Hier fangen wir null-Werte sicher ab für die Ausgabe
+                String tName = lesson.getTeacher() == null ? "No Teacher" : lesson.getTeacher().getName();
+                LOGGER.info("  " + lesson.getSubject() + " (" + lesson.getStudentCount() + ") - " + tName);
             }
         }
     }

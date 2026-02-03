@@ -15,13 +15,13 @@ public class Lesson {
     private String studentGroup;
     private int studentCount;
 
-    @PlanningVariable
+    @PlanningVariable(allowsUnassigned = true)
     private Teacher teacher;
 
-    @PlanningVariable
+    @PlanningVariable(allowsUnassigned = true)
     private Timeslot timeslot;
 
-    @PlanningVariable
+    @PlanningVariable(allowsUnassigned = true)
     private Room room;
 
     // No-arg constructor required for Timefold
