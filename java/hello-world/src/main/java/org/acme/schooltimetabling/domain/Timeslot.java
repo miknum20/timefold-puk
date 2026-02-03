@@ -12,6 +12,8 @@ public class Timeslot {
 
     private DayOfWeek dayOfWeek;
     private LocalTime startTime;
+//    Zum Beispiel "Vormittag" oder "Nachmittag"
+    private String period;
     private LocalTime endTime;
 
     public Timeslot() {

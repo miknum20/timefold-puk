@@ -11,8 +11,12 @@ public class Lesson {
     private String id;
 
     private String subject;
-    private String teacher;
+    //private String teacher;
     private String studentGroup;
+    private int studentCount;
+
+    @PlanningVariable
+    private Teacher teacher;
 
     @PlanningVariable
     private Timeslot timeslot;
@@ -24,17 +28,10 @@ public class Lesson {
     public Lesson() {
     }
 
-    public Lesson(String id, String subject, String teacher, String studentGroup) {
+    public Lesson(String id, String subject, int studentCount) {
         this.id = id;
         this.subject = subject;
-        this.teacher = teacher;
-        this.studentGroup = studentGroup;
-    }
-
-    public Lesson(String id, String subject, String teacher, String studentGroup, Timeslot timeslot, Room room) {
-        this(id, subject, teacher, studentGroup);
-        this.timeslot = timeslot;
-        this.room = room;
+        this.studentCount = studentCount;
     }
 
     @Override
@@ -46,6 +43,10 @@ public class Lesson {
     // Getters and setters
     // ************************************************************************
 
+    // Add Getter/Setter for studentCount
+    public int getStudentCount() { return studentCount; }
+    public void setStudentCount(int studentCount) { this.studentCount = studentCount; }
+
     public String getId() {
         return id;
     }
@@ -54,7 +55,7 @@ public class Lesson {
         return subject;
     }
 
-    public String getTeacher() {
+    public Teacher getTeacher() {
         return teacher;
     }
 
