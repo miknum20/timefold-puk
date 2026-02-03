@@ -15,6 +15,10 @@ public class Timetable {
 
     private String name;
 
+    @ValueRangeProvider(id = "subjectRange") // This ID must match Lesson.java exactly
+    @ProblemFactCollectionProperty
+    private List<String> subjectList;
+
     @ProblemFactCollectionProperty
     @ValueRangeProvider
     private List<Timeslot> timeslots;
@@ -22,7 +26,7 @@ public class Timetable {
     @ValueRangeProvider
     private List<Room> rooms;
 
-    @ValueRangeProvider
+    @ValueRangeProvider(id = "teacherRange")
     @ProblemFactCollectionProperty
     private List<Teacher> teachers;
 
@@ -45,12 +49,12 @@ public class Timetable {
         this.solverStatus = solverStatus;
     }
 
-    public Timetable(String name, List<Timeslot> timeslots, List<Room> rooms, List<Teacher> teachers, List<Lesson> lessons) {
-        this.name = name;
+    public Timetable(List<Timeslot> timeslots, List<Room> rooms, List<Teacher> teachers, List<Lesson> lessons, List<String> subjects) {
         this.timeslots = timeslots;
         this.rooms = rooms;
-        this.teachers = teachers; // abspeichern
+        this.teachers = teachers;
         this.lessons = lessons;
+        this.subjectList = subjects; // This is the "menu" the solver picks from
     }
 
     // ************************************************************************
@@ -85,6 +89,14 @@ public class Timetable {
 
     public void setSolverStatus(SolverStatus solverStatus) {
         this.solverStatus = solverStatus;
+    }
+
+    public List<String> getSubjectList() {
+        return subjectList;
+    }
+
+    public List<Teacher> getTeacherList() {
+        return teachers;
     }
 
 }

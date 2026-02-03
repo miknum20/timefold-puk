@@ -10,42 +10,70 @@ public class Lesson {
     @PlanningId
     private String id;
 
+    // CHANGE 1: Make subject a planning variable so the solver can pick which course to teach in this slot
+    @PlanningVariable(valueRangeProviderRefs = "subjectRange", allowsUnassigned = true)
     private String subject;
-    //private String teacher;
-    private String studentGroup;
-    private int studentCount;
 
-    @PlanningVariable(allowsUnassigned = true)
+    @PlanningVariable(valueRangeProviderRefs = "teacherRange", allowsUnassigned = true)
     private Teacher teacher;
 
-    @PlanningVariable(allowsUnassigned = true)
     private Timeslot timeslot;
-
-    @PlanningVariable(allowsUnassigned = true)
     private Room room;
 
-    // No-arg constructor required for Timefold
     public Lesson() {
     }
 
-    public Lesson(String id, String subject, int studentCount) {
+    // CHANGE 2: Simpler constructor. We don't know the subject or count yet!
+    public Lesson(String id) {
         this.id = id;
-        this.subject = subject;
-        this.studentCount = studentCount;
     }
 
-    @Override
-    public String toString() {
-        return subject + "(" + id + ")";
+    // CHANGE 3: Dynamic Student Count
+    // The number of students is exactly what the room can hold.
+    public int getStudentCount() {
+        if (subject == null || room == null) {
+            return 0;
+        }
+        return room.getCapacity();
+    }
+
+    // CHANGE 4: Fee and Revenue logic updated to use the dynamic subject and room capacity
+    public int getFee() {
+        if (subject == null) return 0;
+        return switch (subject) {
+            case "EDV_01" -> 20;
+            case "EDV_02" -> 30;
+            case "Webdesign" -> 25;
+            case "Malerei" -> 30;
+            case "Tonformen" -> 50;
+            default -> 0;
+        };
+    }
+
+    public int getTotalRevenue() {
+        // Now calculates based on the room the solver chose
+        return getStudentCount() * getFee();
     }
 
     // ************************************************************************
     // Getters and setters
     // ************************************************************************
 
-    // Add Getter/Setter for studentCount
-    public int getStudentCount() { return studentCount; }
-    public void setStudentCount(int studentCount) { this.studentCount = studentCount; }
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public void setTimeslot(Timeslot timeslot) {
+        this.timeslot = timeslot;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 
     public String getId() {
         return id;
@@ -59,39 +87,12 @@ public class Lesson {
         return teacher;
     }
 
-    public String getStudentGroup() {
-        return studentGroup;
-    }
-
     public Timeslot getTimeslot() {
         return timeslot;
     }
 
-    public void setTimeslot(Timeslot timeslot) {
-        this.timeslot = timeslot;
-    }
-
     public Room getRoom() {
         return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    public int getFee() {
-        return switch (subject) {
-            case "EDV_01" -> 20;
-            case "EDV_02" -> 30;
-            case "Webdesign" -> 25;
-            case "Malerei" -> 30;
-            case "Tonformen" -> 50;
-            default -> 0;
-        };
-    }
-
-    public int getTotalRevenue() {
-        return studentCount * getFee();
     }
 
 }

@@ -72,38 +72,24 @@ public class TimetableApp {
         // Kiefer: Malerei, Tonformen. Cap 5. Afternoon Only.
         teachers.add(new Teacher("Herr Kiefer", Set.of("Malerei", "Tonformen"), 5, "AFTERNOON_ONLY"));
 
-        // --- D. Create Lessons (The Demand) ---
-
-        // Define the demand for each course
-        Map<String, Integer> courseDemand = new LinkedHashMap<>();
-        courseDemand.put("EDV_01", 123);
-        courseDemand.put("EDV_02", 50);
-        courseDemand.put("Webdesign", 84);
-        courseDemand.put("Malerei", 105);
-        courseDemand.put("Tonformen", 39);
-
+        // --- D. Create Lesson Containers (One for every Room/Timeslot) ---
         List<Lesson> lessons = new ArrayList<>();
-        long nextLessonId = 0L;
-        int maxClassSize = 10;
+        long nextId = 0;
 
-        for (Map.Entry<String, Integer> entry : courseDemand.entrySet()) {
-            String subject = entry.getKey();
-            int studentsWaiting = entry.getValue();
-
-            // Keep creating lessons until all students are assigned
-            while (studentsWaiting > 0) {
-                // Take 12 students, or however many are left if less than 12
-                int groupSize = Math.min(studentsWaiting, maxClassSize);
-
-                lessons.add(new Lesson(String.valueOf(nextLessonId++), subject, groupSize));
-
-                studentsWaiting -= groupSize;
+        for (Timeslot slot : timeslots) {
+            for (Room room : rooms) {
+                // We create a lesson, but subject and teacher are NOT set yet.
+                // These will be assigned by the solver.
+                Lesson lesson = new Lesson(String.valueOf(nextId++));
+                lesson.setTimeslot(slot);
+                lesson.setRoom(room);
+                lessons.add(lesson);
             }
         }
 
-        // Pass teachers to the Timetable constructor
-        return new Timetable(timeslots.get(0).getId(), timeslots, rooms, teachers, lessons);
+        List<String> subjects = List.of("EDV_01", "EDV_02", "Webdesign", "Malerei", "Tonformen");
 
+        return new Timetable(timeslots, rooms, teachers, lessons, subjects);
     }
 
     private static void printTimetable(Timetable timeTable) {
@@ -146,7 +132,7 @@ public class TimetableApp {
             // Row 3: Student Count (Useful to see!)
             LOGGER.info("|            | "
                     + cells.stream().map(cellLessons -> String.format("%-10s",
-                            cellLessons.stream().map(l -> "(" + l.getStudentCount() + " students)")
+                            cellLessons.stream().map(l -> "(" + l.getStudentCount() + " st.)")
                                     .collect(Collectors.joining(", "))))
                     .collect(Collectors.joining(" | "))
                     + " |");

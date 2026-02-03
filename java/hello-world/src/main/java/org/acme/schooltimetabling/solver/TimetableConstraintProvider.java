@@ -10,45 +10,67 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     @Override
     public Constraint[] defineConstraints(ConstraintFactory factory) {
         return new Constraint[]{
-                // --- HARD CONSTRAINTS (Regeln) ---
-                teacherConflict(factory),        // Lehrer nicht zweiteilen
-                teacherSkillConstraint(factory), // Lehrer muss Fach können
-                teacherTimeAvailability(factory),// Vormittag/Nachmittag
-                teacherCapacityConstraint(factory), // Wochenlimit
-                roomConflict(factory),           // Keine Doppelbelegung im Raum
-                roomCapacityConstraint(factory), // Raumgröße
-                partialAssignmentConflict(factory), // <--- NEU: Keine Räume ohne Lehrer blockieren!
+                // HARD
+                teacherConflict(factory),
+                teacherSkillConstraint(factory),
+                teacherTimeAvailability(factory),
+                teacherCapacityConstraint(factory),
+                studentDemandCap(factory),          // <--- Task C
+                teacherSubjectCoexistence(factory),
 
-                // --- SOFT CONSTRAINT (Motivation) ---
-                maximizeAssignedLessons(factory)
+                // SOFT // <--- Task E
+                maximizeRevenue(factory),
+                minimizeEmptySlots(factory)
         };
     }
 
-    // SOFT: Belohne jeden Kurs, der KOMPLETT (Raum+Zeit+Lehrer) geplant ist
-    Constraint maximizeAssignedLessons(ConstraintFactory factory) {
+    Constraint teacherSubjectCoexistence(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-                .filter(lesson -> lesson.getTimeslot() != null && lesson.getRoom() != null && lesson.getTeacher() != null)
-                .reward(HardSoftScore.ONE_SOFT)
-                .asConstraint("Lesson fully assigned");
-    }
-
-    // HARD: Verhindere, dass ein Raum belegt wird, wenn kein Lehrer da ist
-    Constraint partialAssignmentConflict(ConstraintFactory factory) {
-        return factory.forEach(Lesson.class)
-                .filter(lesson -> lesson.getRoom() != null && lesson.getTeacher() == null)
+                // Match if one is null and the other is NOT null
+                .filter(lesson -> (lesson.getSubject() == null) != (lesson.getTeacher() == null))
                 .penalize(HardSoftScore.ONE_HARD)
-                .asConstraint("Room assigned without teacher");
+                .asConstraint("Teacher and Subject must be assigned together or not at all");
     }
 
-    // HARD: Raumkonflikt (Zählen statt Join -> Robuster gegen Doppelbelegung)
-    Constraint roomConflict(ConstraintFactory factory) {
+    Constraint maximizeRevenue(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-                .filter(lesson -> lesson.getRoom() != null && lesson.getTimeslot() != null)
-                .groupBy(Lesson::getRoom, Lesson::getTimeslot, count())
-                .filter((room, timeslot, count) -> count > 1)
-                .penalize(HardSoftScore.ONE_HARD, (room, timeslot, count) -> count - 1)
-                .asConstraint("Room conflict");
+                .filter(lesson -> lesson.getSubject() != null && lesson.getTeacher() != null)
+                .reward(HardSoftScore.ONE_SOFT, lesson -> lesson.getStudentCount() * lesson.getFee())
+                .asConstraint("Maximize revenue");
     }
+
+    // SOFT: Penalize "Empty" subjects.
+// This forces the solver to replace 'null' with a real course if a teacher is available.
+    Constraint minimizeEmptySlots(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getSubject() == null)
+                .penalize(HardSoftScore.ONE_SOFT)
+                .asConstraint("Minimize empty slots");
+    }
+
+    // ADD this to your constraints
+    Constraint studentDemandCap(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getSubject() != null)
+                .groupBy(Lesson::getSubject, ConstraintCollectors.sum(Lesson::getStudentCount))
+                .filter((subject, assignedCount) -> assignedCount > getMaxDemand(subject))
+                .penalize(HardSoftScore.ONE_HARD,
+                        (subject, assignedCount) -> assignedCount - getMaxDemand(subject))
+                .asConstraint("Too many students for subject");
+    }
+
+    // Helper for Task C demand
+    private int getMaxDemand(String subject) {
+        return switch (subject) {
+            case "EDV_01" -> 123;
+            case "EDV_02" -> 50;
+            case "Webdesign" -> 84;
+            case "Malerei" -> 105;
+            case "Tonformen" -> 39;
+            default -> 0;
+        };
+    }
+
 
     // HARD: Lehrerkonflikt
     Constraint teacherConflict(ConstraintFactory factory) {
