@@ -36,7 +36,7 @@ public class TimetableApp {
 
         // Faktoren: 1.5 (Unbeliebt), 2.2 (Neutral), 2.5 (Beliebt), 3.0 (Begehrt)
 
-        // --- TEIL 1: VEGETARISCH (15 Stück) ---
+        // TEIL 1: VEGETARISCH (15 Stück)
         gerichte.add(new Gericht("V01", "Tofu-Pasta Napoli", true, "Pasta", "Tofu", Arrays.asList("Pasta", "Tofu", "Tomate", "Tomatensauce"), 200, 2.2)); // Neutral
         gerichte.add(new Gericht("V02", "Cremige Pilz-Pasta", true, "Pasta", "Tofu", Arrays.asList("Pasta", "Tofu", "Pilze", "Sahnesauce"), 220, 2.5)); // Beliebt
         gerichte.add(new Gericht("V03", "Fleischersatz-Topf", true, "Kartoffeln", "Fleischersatz", Arrays.asList("Kartoffeln", "Fleischersatz", "Bohnen", "Tomatensauce"), 300, 1.5)); // Unbeliebt
@@ -53,7 +53,7 @@ public class TimetableApp {
         gerichte.add(new Gericht("V14", "Pasta mit Pfeffer-Tofu", true, "Pasta", "Tofu", Arrays.asList("Pasta", "Tofu", "Spinat", "Pfeffersauce"), 230, 2.2));
         gerichte.add(new Gericht("V15", "Bunter Reis-Topf", true, "Reis", "Fleischersatz", Arrays.asList("Reis", "Fleischersatz", "Tomate", "Pfeffersauce"), 250, 1.5));
 
-        // --- TEIL 2: FLEISCH & FISCH (16 Stück) ---
+        // TEIL 2: FLEISCH & FISCH (16 Stück)
         gerichte.add(new Gericht("F01", "Hähnchen-Curry", false, "Reis", "Hähnchen", Arrays.asList("Reis", "Hähnchen", "Zucchini", "Sahnesauce"), 350, 2.5)); // Beliebt
         gerichte.add(new Gericht("F02", "Schweinesteak & Bohnen", false, "Kartoffeln", "Schwein", Arrays.asList("Kartoffeln", "Schwein", "Bohnen", "Pfeffersauce"), 400, 3.0)); // Begehrt
         gerichte.add(new Gericht("F03", "Lachs-Pasta in Sahne", false, "Pasta", "Fisch", Arrays.asList("Pasta", "Fisch", "Spinat", "Sahnesauce"), 450, 3.0)); // Begehrt
@@ -93,7 +93,7 @@ public class TimetableApp {
         });
 
         long gesamtGewinn = 0;
-        long gesamtKosten = 0; // Variable für Kosten wieder eingefügt
+        long gesamtKosten = 0;
 
         for (MensaSlot slot : solution.getSlots()) {
             if (slot.getGericht() != null) {

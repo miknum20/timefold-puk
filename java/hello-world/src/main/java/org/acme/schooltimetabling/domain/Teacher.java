@@ -16,7 +16,10 @@ public class Teacher {
         this.timeRestriction = timeRestriction;
     }
 
-    // Add Getters and Setters here (crucial for Timefold)
+    // ************************************************************************
+    // Getters and setters
+    // ************************************************************************
+
     public String getName() { return name; }
     public Set<String> getSkills() { return skills; }
     public int getMaxCapacity() { return maxCapacity; }

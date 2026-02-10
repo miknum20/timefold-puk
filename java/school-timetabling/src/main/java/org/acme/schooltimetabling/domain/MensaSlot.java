@@ -10,9 +10,8 @@ public class MensaSlot {
     @PlanningId
     private Long id;
 
-    // Diese Werte sind FEST (Problem Facts)
-    private int tag;       // Tag 1 bis 30
-    private int slotIndex; // 1 oder 2 (Es gibt 2 Slots pro Tag)
+    private int tag;
+    private int slotIndex;
 
     // Das ist die Variable, die Timefold ändern darf
     @PlanningVariable

@@ -53,7 +53,7 @@ public class TimetableApp {
             timeslots.add(new Timeslot(Long.toString(nextTimeslotId++), day, LocalTime.of(14, 0), LocalTime.of(17, 0))); // Nachmittag
         }
 
-        // --- B. Create the 4 Rooms ---
+        // Create the 4 Rooms
         List<Room> rooms = new ArrayList<>();
         long nextRoomId = 0L;
         rooms.add(new Room(Long.toString(nextRoomId++), "Raum 01", 10));
@@ -61,7 +61,7 @@ public class TimetableApp {
         rooms.add(new Room(Long.toString(nextRoomId++), "Raum 03", 8));
         rooms.add(new Room(Long.toString(nextRoomId++), "Raum 04", 5));
 
-        // --- C. Create the Teachers (Constraints from PDF) ---
+        // Create the Teachers
         List<Teacher> teachers = new ArrayList<>();
         // Ahorn: EDV_01, EDV_02. Cap 7.
         teachers.add(new Teacher("Frau Ahorn", Set.of("EDV_01", "EDV_02"), 7, "NONE"));
@@ -72,7 +72,7 @@ public class TimetableApp {
         // Kiefer: Malerei, Tonformen. Cap 5. Afternoon Only.
         teachers.add(new Teacher("Herr Kiefer", Set.of("Malerei", "Tonformen"), 5, "AFTERNOON_ONLY"));
 
-        // --- D. Create Lesson Containers (One for every Room/Timeslot) ---
+        // Create Lesson Containers
         List<Lesson> lessons = new ArrayList<>();
         long nextId = 0;
 
@@ -97,12 +97,11 @@ public class TimetableApp {
         List<Room> rooms = timeTable.getRooms();
         List<Lesson> lessons = timeTable.getLessons();
 
-        // Map lessons by timeslot and room for easy grid access
+        // Map lessons by timeslot and room
         Map<Timeslot, Map<Room, Lesson>> lessonMap = lessons.stream()
                 .collect(Collectors.groupingBy(Lesson::getTimeslot,
                         Collectors.toMap(Lesson::getRoom, l -> l)));
 
-        // Header
         LOGGER.info("|            | " + rooms.stream()
                 .map(room -> String.format("%-12s", room.getName())).collect(Collectors.joining(" | ")) + " |");
         LOGGER.info("|" + "--------------|".repeat(rooms.size() + 1));
@@ -110,7 +109,7 @@ public class TimetableApp {
         for (Timeslot timeslot : timeTable.getTimeslots()) {
             Map<Room, Lesson> byRoomMap = lessonMap.getOrDefault(timeslot, Collections.emptyMap());
 
-            // Row 1: Subject
+            // Subject
             LOGGER.info("| " + String.format("%-10s",
                     timeslot.getDayOfWeek().toString().substring(0, 3) + " " + timeslot.getStartTime()) + " | "
                     + rooms.stream().map(room -> {
@@ -118,14 +117,14 @@ public class TimetableApp {
                 return String.format("%-12s", (l == null || l.getTeacher() == null || l.getSubject() == null) ? "      " : l.getSubject());
             }).collect(Collectors.joining(" | ")) + " |");
 
-            // Row 2: Teacher
+            // Teacher
             LOGGER.info("|            | "
                     + rooms.stream().map(room -> {
                 Lesson l = byRoomMap.get(room);
                 return String.format("%-12s", (l == null || l.getTeacher() == null || l.getSubject() == null) ? "      " : l.getTeacher().getName());
             }).collect(Collectors.joining(" | ")) + " |");
 
-            // Row 3: Capacity used
+            // Capacity used
             LOGGER.info("|            | "
                     + rooms.stream().map(room -> {
                 Lesson l = byRoomMap.get(room);
@@ -135,7 +134,7 @@ public class TimetableApp {
             LOGGER.info("|" + "--------------|".repeat(rooms.size() + 1));
         }
 
-        // --- TASK E: Statistics ---
+        // TASK E: Statistics for revenue
         int totalRevenue = lessons.stream().mapToInt(Lesson::getTotalRevenue).sum();
         int totalStudents = lessons.stream().mapToInt(Lesson::getStudentCount).sum();
 

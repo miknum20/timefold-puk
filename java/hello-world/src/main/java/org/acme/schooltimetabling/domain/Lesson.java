@@ -10,7 +10,7 @@ public class Lesson {
     @PlanningId
     private String id;
 
-    // CHANGE 1: Make subject a planning variable so the solver can pick which course to teach in this slot
+    // Make subject a planning variable
     @PlanningVariable(valueRangeProviderRefs = "subjectRange", allowsUnassigned = true)
     private String subject;
 
@@ -23,12 +23,11 @@ public class Lesson {
     public Lesson() {
     }
 
-    // CHANGE 2: Simpler constructor. We don't know the subject or count yet!
     public Lesson(String id) {
         this.id = id;
     }
 
-    // CHANGE 3: Dynamic Student Count
+
     // The number of students is exactly what the room can hold.
     public int getStudentCount() {
         if (subject == null || room == null) {
@@ -37,7 +36,7 @@ public class Lesson {
         return room.getCapacity();
     }
 
-    // CHANGE 4: Fee and Revenue logic updated to use the dynamic subject and room capacity
+    // Fee and Revenue logic
     public int getFee() {
         if (subject == null) return 0;
         return switch (subject) {
@@ -51,7 +50,7 @@ public class Lesson {
     }
 
     public int getTotalRevenue() {
-        // Now calculates based on the room the solver chose
+        // calculate revenue
         return getStudentCount() * getFee();
     }
 
