@@ -7,7 +7,7 @@ import java.util.Objects;
 public class Gericht {
 
     @PlanningId
-    private String id; // z.B. "V01"
+    private String id; // z.B. "V01" = Vegetarisch 1, "F01" = Fleisch 1, etc.
 
     private String name;
     private boolean isVegetarisch;
@@ -60,7 +60,7 @@ public class Gericht {
     @Override
     public String toString() { return name; }
 
-    // WICHTIG: Equals und HashCode für korrekte Vergleiche im Solver
+    // Equals und HashCode für korrekte Vergleiche im Solver
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

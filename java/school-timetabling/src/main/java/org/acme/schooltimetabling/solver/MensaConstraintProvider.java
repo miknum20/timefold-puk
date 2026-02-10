@@ -14,14 +14,14 @@ public class MensaConstraintProvider implements ConstraintProvider {
     @Override
     public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
         return new Constraint[] {
-            // --- HARD CONSTRAINTS (Müssen erfüllt sein - Aufgaben B/C/D) ---
-            fleischUndVeggieMix(constraintFactory),           // Garantiert min. 1 Veggie + Abwechslung
+            // --- HARD CONSTRAINTS  ---
+            fleischUndVeggieMix(constraintFactory),           
             keineGleichenKomponentenAnFolgetagen(constraintFactory),
             unterschiedlicheGerichteAmTag(constraintFactory), 
             gerichtWiederholungVermeiden(constraintFactory),  
             
-            // --- SOFT CONSTRAINTS (Optimierungsziele) ---
-            zutatenSynergieNutzen(constraintFactory), // Aufgabe B: Ähnliche Zutaten
+            // --- SOFT CONSTRAINTS ---
+            zutatenSynergieNutzen(constraintFactory),
             
             // --- AUFGABE 3C: KOSTENMINIMIERUNG (DEAKTIVIERT FÜR 3D) ---
             // kostenMinimieren(constraintFactory), 

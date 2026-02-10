@@ -11,12 +11,12 @@ import java.util.List;
 @PlanningSolution
 public class MensaPlan {
 
-    // Der Pool aus dem wir wählen können (die 31 Gerichte)
+    // Der Pool aus dem wir wählen können (31 Gerichte)
     @ValueRangeProvider
     @ProblemFactCollectionProperty
     private List<Gericht> gerichte;
 
-    // Die leeren Slots, die gefüllt werden müssen (60 Stück)
+    // Die leeren Slots, die gefüllt werden müssen (60 Stück = 30 Tage x 2 Gerichte pro Tag)
     @PlanningEntityCollectionProperty
     private List<MensaSlot> slots;
 
