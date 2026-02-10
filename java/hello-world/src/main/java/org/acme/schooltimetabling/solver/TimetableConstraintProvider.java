@@ -15,22 +15,20 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 teacherSkillConstraint(factory),
                 teacherTimeAvailability(factory),
                 teacherCapacityConstraint(factory),
-                studentDemandCap(factory),          // <--- Task C
+                studentDemandCap(factory),
                 teacherSubjectCoexistence(factory),
 
                 // SOFT //
 
-
-                //Task A-D:
+                //Aufgabe A-D:
                 //maximizeStudents(factory),
 
-                //Task E:
+                //Aufgabe E:
                 maximizeRevenue(factory),
-
-                minimizeEmptySlots(factory)
         };
     }
 
+    // Aufgabe  E:
     Constraint maximizeRevenue(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getSubject() != null && lesson.getTeacher() != null)
@@ -38,7 +36,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .asConstraint("Maximize revenue");
     }
 
-
+    // für Aufgabe A-D
     Constraint maximizeStudents(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getSubject() != null && lesson.getTeacher() != null)
@@ -54,16 +52,6 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .asConstraint("Teacher and Subject must be assigned together");
     }
 
-    // SOFT: Penalize "Empty" subjects.
-// This forces the solver to replace 'null' with a real course if a teacher is available.
-    Constraint minimizeEmptySlots(ConstraintFactory factory) {
-        return factory.forEach(Lesson.class)
-                .filter(lesson -> lesson.getSubject() == null)
-                .penalize(HardSoftScore.ONE_SOFT)
-                .asConstraint("Minimize empty slots");
-    }
-
-    // ADD this to your constraints
     Constraint studentDemandCap(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getSubject() != null)
@@ -74,7 +62,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .asConstraint("Too many students for subject");
     }
 
-    // Helper for Task C demand
+    // Helper für  Aufgabe C
     private int getMaxDemand(String subject) {
         return switch (subject) {
             case "EDV_01" -> 123;
@@ -86,8 +74,6 @@ public class TimetableConstraintProvider implements ConstraintProvider {
         };
     }
 
-
-    // HARD: Lehrerkonflikt
     Constraint teacherConflict(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTeacher() != null && lesson.getTimeslot() != null)
@@ -127,14 +113,5 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .filter((teacher, count) -> count > teacher.getMaxCapacity())
                 .penalize(HardSoftScore.ONE_HARD, (teacher, count) -> count - teacher.getMaxCapacity())
                 .asConstraint("Teacher capacity exceeded");
-    }
-
-    Constraint roomCapacityConstraint(ConstraintFactory factory) {
-        return factory.forEach(Lesson.class)
-                .filter(lesson -> lesson.getRoom() != null)
-                .filter(lesson -> lesson.getStudentCount() > lesson.getRoom().getCapacity())
-                .penalize(HardSoftScore.ONE_HARD,
-                        lesson -> lesson.getStudentCount() - lesson.getRoom().getCapacity())
-                .asConstraint("Room capacity exceeded");
     }
 }
