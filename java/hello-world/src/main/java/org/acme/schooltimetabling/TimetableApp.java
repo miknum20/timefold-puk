@@ -96,64 +96,53 @@ public class TimetableApp {
         LOGGER.info("");
         List<Room> rooms = timeTable.getRooms();
         List<Lesson> lessons = timeTable.getLessons();
-        Map<Timeslot, Map<Room, List<Lesson>>> lessonMap = lessons.stream()
-                .filter(lesson -> lesson.getTimeslot() != null && lesson.getRoom() != null)
-                .collect(Collectors.groupingBy(Lesson::getTimeslot, Collectors.groupingBy(Lesson::getRoom)));
+
+        // Map lessons by timeslot and room for easy grid access
+        Map<Timeslot, Map<Room, Lesson>> lessonMap = lessons.stream()
+                .collect(Collectors.groupingBy(Lesson::getTimeslot,
+                        Collectors.toMap(Lesson::getRoom, l -> l)));
+
+        // Header
         LOGGER.info("|            | " + rooms.stream()
-                .map(room -> String.format("%-10s", room.getName())).collect(Collectors.joining(" | ")) + " |");
-        LOGGER.info("|" + "------------|".repeat(rooms.size() + 1));
+                .map(room -> String.format("%-12s", room.getName())).collect(Collectors.joining(" | ")) + " |");
+        LOGGER.info("|" + "--------------|".repeat(rooms.size() + 1));
+
         for (Timeslot timeslot : timeTable.getTimeslots()) {
-            List<List<Lesson>> cells = rooms.stream()
-                    .map(room -> {
-                        Map<Room, List<Lesson>> byRoomMap = lessonMap.get(timeslot);
-                        if (byRoomMap == null) {
-                            return Collections.<Lesson>emptyList();
-                        }
-                        List<Lesson> cellLessons = byRoomMap.get(room);
-                        return Objects.requireNonNullElse(cellLessons, Collections.<Lesson>emptyList());
-                    }).toList();
+            Map<Room, Lesson> byRoomMap = lessonMap.getOrDefault(timeslot, Collections.emptyMap());
 
             // Row 1: Subject
             LOGGER.info("| " + String.format("%-10s",
                     timeslot.getDayOfWeek().toString().substring(0, 3) + " " + timeslot.getStartTime()) + " | "
-                    + cells.stream().map(cellLessons -> String.format("%-10s",
-                            cellLessons.stream().map(Lesson::getSubject).collect(Collectors.joining(", "))))
-                    .collect(Collectors.joining(" | "))
-                    + " |");
+                    + rooms.stream().map(room -> {
+                Lesson l = byRoomMap.get(room);
+                return String.format("%-12s", (l == null || l.getTeacher() == null || l.getSubject() == null) ? "      " : l.getSubject());
+            }).collect(Collectors.joining(" | ")) + " |");
 
-            // Row 2: Teacher (Assigned)
+            // Row 2: Teacher
             LOGGER.info("|            | "
-                    + cells.stream().map(cellLessons -> String.format("%-10s",
-                            cellLessons.stream().map(l -> l.getTeacher() == null ? "Unassigned" : l.getTeacher().getName())
-                                    .collect(Collectors.joining(", "))))
-                    .collect(Collectors.joining(" | "))
-                    + " |");
+                    + rooms.stream().map(room -> {
+                Lesson l = byRoomMap.get(room);
+                return String.format("%-12s", (l == null || l.getTeacher() == null || l.getSubject() == null) ? "      " : l.getTeacher().getName());
+            }).collect(Collectors.joining(" | ")) + " |");
 
-            // Row 3: Student Count (Useful to see!)
+            // Row 3: Capacity used
             LOGGER.info("|            | "
-                    + cells.stream().map(cellLessons -> String.format("%-10s",
-                            cellLessons.stream().map(l -> "(" + l.getStudentCount() + " st.)")
-                                    .collect(Collectors.joining(", "))))
-                    .collect(Collectors.joining(" | "))
-                    + " |");
+                    + rooms.stream().map(room -> {
+                Lesson l = byRoomMap.get(room);
+                return String.format("%-12s", (l == null || l.getTeacher() == null || l.getSubject() == null) ? "      " : "(" + l.getStudentCount() + " st.)");
+            }).collect(Collectors.joining(" | ")) + " |");
 
-            LOGGER.info("|" + "------------|".repeat(rooms.size() + 1));
-
+            LOGGER.info("|" + "--------------|".repeat(rooms.size() + 1));
         }
 
-        List<Lesson> unassignedLessons = lessons.stream()
-                .filter(lesson -> lesson.getTimeslot() == null || lesson.getRoom() == null || lesson.getTeacher() == null)
-                .toList();
+        // --- TASK E: Statistics ---
+        int totalRevenue = lessons.stream().mapToInt(Lesson::getTotalRevenue).sum();
+        int totalStudents = lessons.stream().mapToInt(Lesson::getStudentCount).sum();
 
-        if (!unassignedLessons.isEmpty()) {
-            LOGGER.info("");
-            LOGGER.info("Unassigned lessons (" + unassignedLessons.size() + "):");
-            for (Lesson lesson : unassignedLessons) {
-                // Fix: Added check for null teacher
-                String teacherName = (lesson.getTeacher() == null) ? "No Teacher" : lesson.getTeacher().getName();
-                LOGGER.info("  " + lesson.getSubject() + " [" + lesson.getStudentCount() + " students] - " + teacherName);
-            }
-        }
+        LOGGER.info("");
+        LOGGER.info("Total Revenue: " + totalRevenue + " €");
+        LOGGER.info("Total Students Scheduled: " + totalStudents + " / 401");
     }
+
 
 }

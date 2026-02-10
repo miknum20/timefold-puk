@@ -18,18 +18,17 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 studentDemandCap(factory),          // <--- Task C
                 teacherSubjectCoexistence(factory),
 
-                // SOFT // <--- Task E
+                // SOFT //
+
+
+                //Task A-D:
+                //maximizeStudents(factory),
+
+                //Task E:
                 maximizeRevenue(factory),
+
                 minimizeEmptySlots(factory)
         };
-    }
-
-    Constraint teacherSubjectCoexistence(ConstraintFactory factory) {
-        return factory.forEach(Lesson.class)
-                // Match if one is null and the other is NOT null
-                .filter(lesson -> (lesson.getSubject() == null) != (lesson.getTeacher() == null))
-                .penalize(HardSoftScore.ONE_HARD)
-                .asConstraint("Teacher and Subject must be assigned together or not at all");
     }
 
     Constraint maximizeRevenue(ConstraintFactory factory) {
@@ -37,6 +36,22 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .filter(lesson -> lesson.getSubject() != null && lesson.getTeacher() != null)
                 .reward(HardSoftScore.ONE_SOFT, lesson -> lesson.getStudentCount() * lesson.getFee())
                 .asConstraint("Maximize revenue");
+    }
+
+
+    Constraint maximizeStudents(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getSubject() != null && lesson.getTeacher() != null)
+                .reward(HardSoftScore.ONE_SOFT, Lesson::getStudentCount)
+                .asConstraint("Maximize students");
+    }
+
+    Constraint teacherSubjectCoexistence(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                // Penalize if (Subject is null AND Teacher is NOT null)
+                .filter(lesson -> (lesson.getSubject() == null) != (lesson.getTeacher() == null))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Teacher and Subject must be assigned together");
     }
 
     // SOFT: Penalize "Empty" subjects.
