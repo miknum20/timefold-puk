@@ -30,7 +30,7 @@ public class Lesson {
 
     // The number of students is exactly what the room can hold.
     public int getStudentCount() {
-        if (subject == null || room == null) {
+        if (subject == null || room == null || teacher == null) {
             return 0;
         }
         return room.getCapacity();
